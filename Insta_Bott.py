@@ -10,7 +10,7 @@ user_name = ""  # Your username
 class InstaBot:
     def __init__(self, username, password):
         self.username = username
-        self.driver = webdriver.Chrome("")  # PATH TO WEBDRIVER check README
+        self.driver = webdriver.Chrome("C:\wedriver\chromedriver")  # PATH TO WEBDRIVER check README
         self._estate = '1'
         self.driver.get("https://www.instagram.com/")
         sleep(2)
@@ -50,31 +50,55 @@ class InstaBot:
         followers = self.get_names()
         not_following_back = [user for user in following if user not in followers]
         data = not_following_back
-        index = [1 + int(i) for i in range(len(data))]
-        columns = ['Usuário']
-        df = pd.DataFrame(data=data, index=index, columns=columns)
+        df = pd.Series(data=data)
         df.to_csv('df.csv', sep=';')
 
     def get_names(self):
         local = self.driver.find_element_by_xpath('/html/body/div[4]/div/div/div[2]/ul/div')
         local.click() 
         if self._estate == '1':
-            n = 150  # N for following
-        else:  # Tip, 150 is a good reference for 500 following users, calculate 'n' by considering //
-               # the amount of following/followers you got on your account
-            n = 90  # N for followed         
-        for i in range(n):
+            n = 65  # N for following
+        else:  
+            n = 65  # N for followed        
+        links = []
+        while len(links) <= (n):
             sleep(0.5)
             local.click()
             html = self.driver.find_element_by_tag_name('html')
             html.send_keys(Keys.PAGE_DOWN)
-            print(i) 
-        links = local.find_elements_by_tag_name('a')
+            links = local.find_elements_by_tag_name('a')
         names = [name.text for name in links if name != '']
         self.driver.find_element_by_xpath('/html/body/div[4]/div/div/div[1]/div/div[2]/button').click()
         return names
 
 
+    def unfollowing(self):  # Only call if a csv file exists
+        data_u = pd.read_csv('df01.csv', sep=';')
+        stay = []  # List of people u want to still follow
+        for i in range(len(stay)):
+            rmv = stay[i]
+            data_u = data_u.drop(rmv)
+        data_u = data_u.values.tolist()
+        #for i in range(n): # In case the scripts stops by not finding an xpath
+        #  del(data_u[0]) the n value is the amount of people you have already unfollowed in the loop
+        # might not be necessaire, but sometimes it glitches
+        for i in range(len(data_u)):
+            name_u = str(data_u[i])
+            index = name_u.find('\'')
+            name_u = name_u[index + 1:]
+            index = name_u.find('\'')
+            name_u = name_u[:index]
+            sleep(3)
+            self.driver.find_element_by_xpath('//*[@id="react-root"]/section/nav/div[2]/div/div/div[2]/input').send_keys(name_u)
+            sleep(1)
+            self.driver.find_element_by_xpath(f"//a[contains(@href,'/{name_u}/')]").click()
+            sleep(1.5)
+            self.driver.find_element_by_class_name('_5f5mN').click()
+            self.driver.find_element_by_xpath('/html/body/div[4]/div/div/div/div[3]/button[1]').click()
+
+
+
 bot = InstaBot(user_name, pw)
-bot.get_unfollowers()
-bot.driver.close()
+#bot.get_unfollowers()
+#bot.unfollowing()
+#bot.driver.close()
