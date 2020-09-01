@@ -5,6 +5,8 @@ from selenium.webdriver.common.keys import Keys
 import pandas as pd
 
 user_name = ""  # Your username
+followers = 0
+following = 0
 
 
 class InstaBot:
@@ -100,7 +102,7 @@ class InstaBot:
 
 
 
-bot = InstaBot(user_name, pw)
+bot = InstaBot(user_name, pw, followers, following)
 #bot.get_unfollowers()
 #bot.unfollowing()
 #bot.driver.close()
