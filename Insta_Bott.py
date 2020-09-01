@@ -8,8 +8,10 @@ user_name = ""  # Your username
 
 
 class InstaBot:
-    def __init__(self, username, password):
+    def __init__(self, username, password, followers, following):
         self.username = username
+        self.followers = followers
+        self.following = following
         self.driver = webdriver.Chrome("C:\wedriver\chromedriver")  # PATH TO WEBDRIVER check README
         self._estate = '1'
         self.driver.get("https://www.instagram.com/")
@@ -57,9 +59,9 @@ class InstaBot:
         local = self.driver.find_element_by_xpath('/html/body/div[4]/div/div/div[2]/ul/div')
         local.click() 
         if self._estate == '1':
-            n = 65  # N for following
+            n = self.following  # N for following
         else:  
-            n = 65  # N for followed        
+            n = self.followers  # N for followed        
         links = []
         while len(links) <= (n):
             sleep(0.5)
